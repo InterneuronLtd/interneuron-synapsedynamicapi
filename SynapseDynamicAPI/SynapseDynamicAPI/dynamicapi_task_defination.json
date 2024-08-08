@@ -1,0 +1,46 @@
+{
+    "family": "env-dynamicapi",
+    "taskRoleArn": "",
+    "executionRoleArn": "arn:aws:iam::account_number:role/ecsTaskExecutionRole",
+   
+    "containerDefinitions": [
+        {
+            "name": "ecs-env-dynamicapi",
+            "image": "account_number.dkr.ecr.region.amazonaws.com/env-dynamicapi:tag",
+           
+           
+            "portMappings": [
+                {
+                    "hostPort": 0,
+                    "protocol": "tcp",
+                    "containerPort": 80
+                }
+            ],
+            "environment": [
+                {
+                    "name": "ASPNETCORE_ENVIRONMENT",
+                    "value": "interneuron_environment"
+                }
+            ],
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:80/hc || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 40
+            }
+          
+        }
+    ],
+
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "cpu": "500",
+    "memory": "1024",
+    "pidMode": "task",
+    "ipcMode": "task"
+}

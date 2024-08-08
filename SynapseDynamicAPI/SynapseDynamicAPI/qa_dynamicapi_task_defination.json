@@ -1,0 +1,30 @@
+{
+    "family": "qa-dynamicapi",
+    "taskRoleArn": "",
+    "executionRoleArn": "arn:aws:iam::114918358738:role/ecsTaskExecutionRole",
+   
+    "containerDefinitions": [
+        {
+            "name": "ecs-qa-dynamicapi",
+            "image": "114918358738.dkr.ecr.ap-south-1.amazonaws.com/qa-dynamicapi:tag",
+           
+           
+            "portMappings": [
+                {
+                    "hostPort": 0,
+                    "protocol": "tcp",
+                    "containerPort": 80
+                }
+            ]
+          
+        }
+    ],
+
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "cpu": "500",
+    "memory": "1024",
+    "pidMode": "task",
+    "ipcMode": "task"
+}
