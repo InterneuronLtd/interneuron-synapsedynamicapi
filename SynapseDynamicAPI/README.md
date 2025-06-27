@@ -1,5 +1,5 @@
 # Synapse Dynamic API
-
+ 
 ## Introduction
 
 This Read Me is provided to give guidance on the installation and configuration of Synapse Dynamic API.

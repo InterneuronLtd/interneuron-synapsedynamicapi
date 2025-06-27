@@ -1,4 +1,4 @@
-# Interneuron Synapse v1.1.0
+# Interneuron Synapse v1.1.0     
 
 Our flagship product, Interneuron Synapse is the foundation of all our applications. Interneuron Synapse provides
 
@@ -9,7 +9,7 @@ Our flagship product, Interneuron Synapse is the foundation of all our applicati
 - An open source stack – PostgreSQL, .NET Core
 
 ## Installation
-
+ 
 Please see the links below for the installation of individual services and our sample applications:
 
 - [Identity Services](/Synapse.STS/README.md)

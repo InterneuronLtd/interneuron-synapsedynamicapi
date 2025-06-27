@@ -42,6 +42,7 @@ using Microsoft.AspNetCore.Builder;
 using Serilog;
 using System.IO;
 using Interneuron.Infrastructure.Web.Logging;
+using Microsoft.Extensions.Hosting;
 
 namespace SynapseDynamicAPI
 {
@@ -62,10 +63,11 @@ namespace SynapseDynamicAPI
             try
             {
                 Log.Information(ProgramInitMsg, AppName);
-                var host = BuildWebHost(configuration, args);
+                //var host = BuildWebHost(configuration, args);
+                CreateHostBuilder(args).Build().Run();
 
                 Log.Information(ProgramStartMsg, AppName);
-                host.Run();
+                //host.Run();
 
                 return 0;
             }
@@ -80,16 +82,34 @@ namespace SynapseDynamicAPI
             }
         }
 
-        public static IWebHost BuildWebHost(IConfiguration configuration, string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-               .UseKestrel()
-                .UseStartup<Startup>()
-                .UseIISIntegration()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseConfiguration(configuration)
-                .UseSerilog()
-                .Build();
+        //public static IWebHost BuildWebHost(IConfiguration configuration, string[] args) =>
+        //    WebHost.CreateDefaultBuilder(args)
+        //       .UseKestrel()
+        //        .UseStartup<Startup>()
+        //        .UseIISIntegration()
+        //        .UseContentRoot(Directory.GetCurrentDirectory())
+        //        .UseConfiguration(configuration)
+        //        .UseSerilog()
+        //        .Build();
 
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .UseSerilog()
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    var environmentName = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+
+                    config.SetBasePath(Directory.GetCurrentDirectory())
+                          .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                          .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
+                          .AddEnvironmentVariables();
+                })
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>()
+                              .UseKestrel()
+                              .UseIISIntegration();
+                });
 
         private static IConfiguration GetConfiguration()
         {

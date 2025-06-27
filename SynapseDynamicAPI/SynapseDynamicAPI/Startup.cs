@@ -61,6 +61,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SynapseDynamicAPI.Models;
 
 namespace SynapseDynamicAPI
 {
@@ -69,6 +70,8 @@ namespace SynapseDynamicAPI
         IConfigurationSection SwaggerSection = null;
         IConfigurationSection SynapseCoreSection = null;
         IConfigurationSection SynapseCoreSettingsSection = null;
+
+        private readonly SecurityHeadersOptions _securityHeadersOptions;
 
         public Startup(IConfiguration configuration)
         {
@@ -82,6 +85,8 @@ namespace SynapseDynamicAPI
             SynapseCoreSection = Configuration.GetSection("SynapseCore");
 
             SynapseCoreSettingsSection = SynapseCoreSection.GetSection("Settings");
+
+            _securityHeadersOptions = Configuration.GetSection("SecurityHeaders").Get<SecurityHeadersOptions>();
         }
 
         public IConfiguration Configuration { get; }
@@ -240,6 +245,22 @@ namespace SynapseDynamicAPI
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.Use(async (context, next) =>
+            {
+                await next();
+
+                if (_securityHeadersOptions?.Headers != null)
+                {
+                    foreach (var header in _securityHeadersOptions.Headers)
+                    {
+                        if (!string.IsNullOrEmpty(header.Key) && !string.IsNullOrEmpty(header.Value))
+                        {
+                            context.Response.Headers[header.Key] = header.Value;
+                        }
+                    }
+                }
+            });
 
             //required to persit the request body (not retained on exception)
             app.UseMiddleware<InterneuronResetRequestBodyStreamMiddleware>();
